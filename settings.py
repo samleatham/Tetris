@@ -16,6 +16,10 @@ BLACK = (0, 0, 0)
 # game settings
 
 FPS = 60
+POINTS = 0
+# the number of frames before the tetremino is forced to move a block down
+LIMIT = 30
+START_X = 5
 
 # controls
 
