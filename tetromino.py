@@ -54,6 +54,9 @@ class Tetromino():
                     self.blocks[i] = (block[1], -block[0])
                 return
 
+    def blocks_overlap(self, block):
+        return len(set(self.get_spaces()) & set(block.get_spaces())) == 4
+
 
 def randomTet(x, y, board):
     tets = [SquareTet, LTet, LFlipTet, STet, SFlipTet, LongTet, TTet]

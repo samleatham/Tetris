@@ -19,6 +19,7 @@ class Board:
             self.board[i] = self.board[i - 1]
             # increment the point total by sending a message to the main loop
         self.board[0] = [0 for i in range(self.get_board_length())]
+        pygame.event.post(pygame.event.Event(settings.LINE_CLEARED))
 
     def check_lines(self):
         for i, row in enumerate(self.board):
@@ -51,7 +52,7 @@ class Board:
             square.x = square.width * x
             square.y = square.width * (y - 1)
             if outline:
-                pygame.draw.rect(surface, settings.WHITE, square, 10)
+                pygame.draw.rect(surface, settings.WHITE, square, 7)
             else:
                 pygame.draw.rect(surface, settings.WHITE, square)
         return surface
@@ -66,7 +67,10 @@ class Board:
 
         if block:
             surface = self.draw_block(surface, block)
-            surface = self.draw_block(surface, self.project_block(block), True)
+            projected_block = self.project_block(block)
+            if not block.blocks_overlap(projected_block):
+                surface = self.draw_block(
+                    surface, self.project_block(block), True)
 
         for row in self.board[1:]:
             for block in row:

@@ -50,8 +50,10 @@ def main():
     clock = pygame.time.Clock()
     running = True
     frame = 0
+    points = 0
     controledBlock = tetromino.randomTet(5, 0, board)
     while running:
+        linescleared = False
         WIN = pygame.display.set_mode((settings.WIN_RES))
         clock.tick(settings.FPS)
         frame = (frame + 1) % 60
@@ -59,6 +61,16 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
                 pygame.quit()
+
+            if event.type == settings.GAME_OVER:
+                running = False
+                pygame.time.delay(5000)
+                pygame.quit()
+
+            if event.type == settings.LINE_CLEARED:
+                print("yay")
+                linescleared = True
+                points += 1
 
             if event.type == pygame.KEYDOWN:
                 if event.key == settings.CONTROLS["down"]:
@@ -85,6 +97,9 @@ def main():
 
                 if event.key == settings.CONTROLS["rotate"]:
                     controledBlock.rotate()
+
+        if linescleared:
+            print("Line Cleared! Score: " + str(points))
 
         # print(controledBlock.get_spaces())
 
