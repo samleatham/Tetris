@@ -26,6 +26,14 @@ class Board:
             if sum(row) == self.get_board_length():
                 self.clear_line(i)
 
+    def get_empties(self):
+        empties = []
+        # go from bottom to top
+        for i, row in reversed(list(enumerate(self.board))):
+            for j, block in enumerate(row):
+                empties.append((i, j))
+        return empties
+
     def add_block(self, block):
         for x, y in block.get_spaces():
             self.board[y][x] = 1

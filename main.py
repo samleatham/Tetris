@@ -1,47 +1,27 @@
 import pygame
-import os
 import settings
-import copy
 import tetromino
 from board import Board
 
 
-def print2d(board):
-    for row in board:
-        print(row)
-
-
-def removeLine(board, line):
-    for i in range(line, 0, -1):
-        board[i] = board[i - 1]
-    board[0] = [0 for i in range(len(board[0]))]
-    return board
-
-
-def checkLines(board):
-    for i, row in enumerate(board):
-        if sum(row) == len(row):
-            # a full line has been completed and should be removed
-            board = removeLine(board, i)
-            settings.POINTS += 1
-    if sum(board[0]) > 0:
-        board = [[1 for i in range(settings.WIDTH)]
-                 for j in range(settings.HEIGHT + 1)]
-    return board
-
-
-def addBlocktoBoard(board, block):
-    temp_board = copy.deepcopy(board)
-    for x, y in block.get_spaces():
-        print(x, y)
-        print(len(temp_board), len(temp_board[y]))
-        temp_board[y][x] = 1
-    return temp_board
-
-
 def drawdisplay(board, window, controlled_block):
-    window.blit(board.draw_board((settings.WIN_RES), controlled_block), (0, 0))
+    window.blit(board.draw_board(settings.WIN_RES, controlled_block), (0, 0))
     pygame.display.update()
+
+
+# this method will have the animation of the blocks filling up the screen
+def gameOver(board, window):
+    waitTime = 40
+    count = 0
+    for empty_i, empty_j in board.get_empties():
+        count += 1
+        if count % 20 == 0:
+            waitTime -= 2
+        board.board[empty_i][empty_j] = 1
+        window.blit(board.draw_board(settings.WIN_RES), (0, 0))
+        pygame.time.delay(waitTime)
+        pygame.display.update()
+
 
 def main():
 
@@ -49,6 +29,7 @@ def main():
 
     clock = pygame.time.Clock()
     running = True
+    held = None
     frame = 0
     points = 0
     controledBlock = tetromino.randomTet(5, 0, board)
@@ -60,12 +41,12 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-                pygame.quit()
+                break
 
             if event.type == settings.GAME_OVER:
                 running = False
-                pygame.time.delay(5000)
-                pygame.quit()
+                gameOver(board, WIN)
+                break
 
             if event.type == settings.LINE_CLEARED:
                 print("yay")
