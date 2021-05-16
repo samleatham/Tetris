@@ -25,3 +25,8 @@ START_X = 5
 
 CONTROLS = {"left": pygame.K_LEFT, "right": pygame.K_RIGHT, "down": pygame.K_DOWN,
             "rotate": pygame.K_UP, "slam": pygame.K_SPACE, "hold": pygame.K_RSHIFT}
+
+# event codes
+
+GAME_OVER = pygame.USEREVENT + 1
+LINE_CLEARED = pygame.USEREVENT + 2

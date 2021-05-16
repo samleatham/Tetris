@@ -3,7 +3,7 @@ import os
 import settings
 import copy
 import tetromino
-from tetromino import SquareTet, LTet
+from board import Board
 
 
 def print2d(board):
@@ -40,32 +40,19 @@ def addBlocktoBoard(board, block):
 
 
 def drawdisplay(board, window, controlled_block):
-    # makes a default rectangle based on the size of the window
-    square = pygame.Rect(0, 0, settings.WIN_WIDTH // len(board[0]),
-                         settings.WIN_HEIGHT // (len(board) - 1))
-    for row in addBlocktoBoard(board, controlled_block)[1:]:
-        for block in row:
-            if block:
-                pygame.draw.rect(window, settings.WHITE, square)
-            else:
-                pygame.draw.rect(window, settings.BLACK, square)
-            pygame.draw.rect(window, settings.BLACK, square, 5)
-            square.x += square.width
-        square.y += square.height
-        square.x = 0
+    window.blit(board.draw_board((settings.WIN_RES), controlled_block), (0, 0))
     pygame.display.update()
 
-
 def main():
-    WIN = pygame.display.set_mode((settings.WIN_RES))
-    board = [[0 for i in range(settings.WIDTH)]
-             for j in range(settings.HEIGHT + 1)]
+
+    board = Board(settings.WIDTH, settings.HEIGHT)
 
     clock = pygame.time.Clock()
     running = True
     frame = 0
-    controledBlock = tetromino.randomTet(5, 0)
+    controledBlock = tetromino.randomTet(5, 0, board)
     while running:
+        WIN = pygame.display.set_mode((settings.WIN_RES))
         clock.tick(settings.FPS)
         frame = (frame + 1) % 60
         for event in pygame.event.get():
@@ -77,36 +64,36 @@ def main():
                 if event.key == settings.CONTROLS["down"]:
                     frame = 0
                     # if the down button is held the tetromino will move down one until it hits the bottom
-                    if controledBlock.movedown(board):
-                        board = addBlocktoBoard(board, controledBlock)
+                    if controledBlock.movedown():
+                        board.add_block(controledBlock)
                         controledBlock = tetromino.randomTet(
-                            settings.START_X, 0)
+                            settings.START_X, 0, board)
 
                 if event.key == settings.CONTROLS["slam"]:
                     while True:
-                        if controledBlock.movedown(board):
-                            board = checkLines(
-                                addBlocktoBoard(board, controledBlock))
+                        if controledBlock.movedown():
+                            board.add_block(controledBlock)
                             controledBlock = tetromino.randomTet(
-                                settings.START_X, 0)
+                                settings.START_X, 0, board)
                             break
 
                 if event.key == settings.CONTROLS["right"]:
-                    controledBlock.movesideways(board, 1)
+                    controledBlock.movesideways(1)
 
                 if event.key == settings.CONTROLS["left"]:
-                    controledBlock.movesideways(board, -1)
+                    controledBlock.movesideways(-1)
 
                 if event.key == settings.CONTROLS["rotate"]:
-                    controledBlock.rotate(board)
+                    controledBlock.rotate()
 
-        print(controledBlock.get_spaces())
+        # print(controledBlock.get_spaces())
 
         if frame >= 30:
             frame = 0
-            if controledBlock.movedown(board):
-                board = checkLines(addBlocktoBoard(board, controledBlock))
-                controledBlock = tetromino.randomTet(settings.START_X, 0)
+            if controledBlock.movedown():
+                board.add_block(controledBlock)
+                controledBlock = tetromino.randomTet(
+                    settings.START_X, 0, board)
         # print(controledBlock.get_spaces())
 
         """
