@@ -45,10 +45,9 @@ class Board:
             # given a block's location it projects where it will land
 
     def project_block(self, block):
-        temp_block = copy.deepcopy(block)
-        while True:
-            if temp_block.movedown():
-                return temp_block
+        projected_block = copy.deepcopy(block)
+        projected_block.slam(True)
+        return projected_block
 
     def check_collisions(self, x, y):
         return x < 0 or y < 0 or y >= self.get_board_height() or x >= self.get_board_length() or self.board[y][x]

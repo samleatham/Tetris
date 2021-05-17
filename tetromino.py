@@ -1,4 +1,6 @@
 import random
+import pygame
+import settings
 
 
 def boardSpotTaken(x, y, board):
@@ -27,11 +29,22 @@ class Tetromino():
         # checks all the coordinates of the blocks if they were moved 1 space down
         for coordinate in self.get_spaces(0, 1):
             if self.board.check_collisions(coordinate[0], coordinate[1]):
-                return True
+                pygame.event.post(pygame.event.Event(settings.BLOCK_PLACED))
+                return
         self.y += 1
-        return False
+
+    def slam(self, projection=False):
+        for i in range(1, (self.board.get_board_height() - self.y)):
+            for coordinate in self.get_spaces(0, i):
+                if self.board.check_collisions(coordinate[0], coordinate[1]):
+                    self.y += (i - 1)
+                    if not projection:
+                        pygame.event.post(
+                            pygame.event.Event(settings.BLOCK_PLACED))
+                    return
 
     # attempts to move the piece in the direction
+
     def movesideways(self, dir):
         canMove = True
         for coordinate in self.get_spaces(dir):
@@ -58,14 +71,10 @@ class Tetromino():
         return len(set(self.get_spaces()) & set(block.get_spaces())) == 4
 
 
-def randomTet(x, y, board):
-    tets = [SquareTet, LTet, LFlipTet, STet, SFlipTet, LongTet, TTet]
-    return random.choice(tets)(x, y, board)
-
-
 class SquareTet(Tetromino):
     def __init__(self, x, y, board):
         super().__init__(x, y, board, (1, 0), (0, 1), (1, 1))
+        self.index = 0
 
     def rotate(self):
         # rotating a square block doesnt change anything so the method is overwritten
@@ -75,28 +84,45 @@ class SquareTet(Tetromino):
 class LTet(Tetromino):
     def __init__(self, x, y, board):
         super().__init__(x, y, board, (-1, 1), (-1, 0), (1, 0))
+        self.index = 1
 
 
 class LFlipTet(Tetromino):
     def __init__(self, x, y, board):
         super().__init__(x, y, board, (1, 1), (1, 0), (-1, 0))
+        self.index = 2
 
 
 class STet(Tetromino):
     def __init__(self, x, y, board):
         super().__init__(x, y, board, (0, 1), (-1, 1), (1, 0))
+        self.index = 3
 
 
 class SFlipTet(Tetromino):
     def __init__(self, x, y, board):
         super().__init__(x, y, board, (0, 1), (1, 1), (-1, 0))
+        self.index = 4
 
 
 class LongTet(Tetromino):
     def __init__(self, x, y, board):
         super().__init__(x, y, board, (-1, 0), (1, 0), (2, 0))
+        self.index = 5
 
 
 class TTet(Tetromino):
     def __init__(self, x, y, board):
         super().__init__(x, y, board, (-1, 0), (1, 0), (0, 1))
+        self.index = 6
+
+
+tets = [SquareTet, LTet, LFlipTet, STet, SFlipTet, LongTet, TTet]
+
+
+def randomTet(x, y, board):
+    return random.choice(tets)(x, y, board)
+
+
+def createTet(x, y, board, index):
+    return tets[index](x, y, board)
